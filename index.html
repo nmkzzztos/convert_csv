@@ -9,6 +9,13 @@
 <body>
     <h1>CSV Kombinieren und Herunterladen</h1>
     <input type="file" id="csvFileInput" accept=".csv">
+    <br><br>
+    <label for="startRow">Startzeile:</label>
+    <input type="number" id="startRow" value="1" min="1">
+    <br><br>
+    <label for="fileName">Neuer Dateiname:</label>
+    <input type="text" id="fileName" value="kombiniert.csv">
+    <br><br>
     <button onclick="combineCSV()">CSV Kombinieren</button>
     <button id="downloadButton" style="display:none;" onclick="downloadCSV()">CSV Herunterladen</button>
     <br><br>
@@ -17,8 +24,16 @@
     <script>
         let combinedContent = '';
 
-        document.getElementById('csvFileInput').addEventListener('change', function(event) {
-            const file = event.target.files[0];
+        function combineCSV() {
+            const fileInput = document.getElementById('csvFileInput');
+            const startRow = parseInt(document.getElementById('startRow').value) || 1;
+
+            if (!fileInput.files.length) {
+                alert('Bitte wähle eine CSV-Datei aus.');
+                return;
+            }
+
+            const file = fileInput.files[0];
             const reader = new FileReader();
 
             reader.onload = function(e) {
@@ -27,7 +42,7 @@
                     header: false,
                     encoding: "UTF-8",
                     complete: function(results) {
-                        const data = results.data;
+                        const data = results.data.slice(startRow - 1);
                         let combinedData = [];
 
                         data.forEach(row => {
@@ -49,23 +64,16 @@
             };
 
             reader.readAsText(file, 'UTF-8');
-        });
-
-        function combineCSV() {
-            const fileInput = document.getElementById('csvFileInput');
-            if (!fileInput.files.length) {
-                alert('Bitte wähle eine CSV-Datei aus.');
-                return;
-            }
         }
 
         function downloadCSV() {
+            const fileName = document.getElementById('fileName').value || 'kombiniert.csv';
             const blob = new Blob(['\ufeff' + combinedContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const downloadLink = document.createElement('a');
 
             downloadLink.href = url;
-            downloadLink.download = 'kombiniert.csv';
+            downloadLink.download = fileName;
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
