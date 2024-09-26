@@ -14,7 +14,7 @@
     <input type="number" id="startRow" value="1" min="1">
     <br><br>
     <label for="fileName">Neuer Dateiname:</label>
-    <input type="text" id="fileName" value="kombiniert.csv">
+    <input type="text" id="fileName">
     <br><br>
     <button onclick="combineCSV()">CSV Kombinieren</button>
     <button id="downloadButton" style="display:none;" onclick="downloadCSV()">CSV Herunterladen</button>
@@ -34,6 +34,8 @@
             }
 
             const file = fileInput.files[0];
+            originalFileName = file.name.replace('.csv', '');
+            document.getElementById('fileName').value = `${originalFileName}.csv`;
             const reader = new FileReader();
 
             reader.onload = function(e) {
@@ -69,7 +71,8 @@
         }
 
         function downloadCSV() {
-            const fileName = document.getElementById('fileName').value || 'kombiniert.csv';
+            const fileNameInput = document.getElementById('fileName');
+            const fileName = fileNameInput.value || `${originalFileName}.csv`;
             const blob = new Blob(['\ufeff' + combinedContent], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const downloadLink = document.createElement('a');
