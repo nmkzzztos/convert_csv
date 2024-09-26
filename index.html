@@ -46,10 +46,12 @@
                         let combinedData = [];
 
                         data.forEach(row => {
-                            combinedData = combinedData.concat(row.filter(cell => cell.trim() !== ''));
+                            const combinedRow = row.join(';').replace(/;+$/, '');
+                            const quotedRow = '"' + combinedRow.replace(/"/g, '""') + '"';
+                            combinedData.push(quotedRow);
                         });
 
-                        combinedContent = combinedData.map(cell => `"${cell.replace(/"/g, '""')}"`).join(';');
+                        combinedContent = combinedData.join('\n');
                         document.getElementById('output').value = combinedContent;
                         document.getElementById('downloadButton').style.display = 'inline';
                     },
